@@ -84,7 +84,7 @@ def accumulate_tree(root, add):
   else:
     return Tree(accumulate_tree(root.left, root.value + add), accumulate_tree(root.right, root.value + add), root.value + add)
 
-rep_tree(accumulate_tree(root, 0), 4)
+#rep_tree(accumulate_tree(root, 0), 4)
 
 def minimax(root, level):
   if (root.left == None) and (root.right == None):
@@ -105,25 +105,59 @@ test11 = Tree(None, None, 9)
 test10 = Tree(None, None, 6)
 test9 = Tree(None, None, 5)
 test8 = Tree(None, None, 3)
-test7 = Tree(test14, test15, 10)
-test6 = Tree(test12, test13, 10)
-test5 = Tree(test10, test11, 10)
-test4 = Tree(test8, test9, 10)
-test3 = Tree(test6, test7, 10)
-test2 = Tree(test4, test5, 10)
-test1 = Tree(test2, test3, 10)
+test7 = Tree(test14, test15, 11)
+test6 = Tree(test12, test13, 12)
+test5 = Tree(test10, test11, 13)
+test4 = Tree(test8, test9, 14)
+test3 = Tree(test6, test7, 15)
+test2 = Tree(test4, test5, 16)
+test1 = Tree(test2, test3, 17)
 
 print(minimax(test1, 0))
+rep_tree(test1, 4)
+
+counter = 0
 
 def alphabeta(root, level, alpha, beta):
+  global counter
+  counter = counter + 1
   if (root.left == None) and (root.right == None):
-    return root.value
-  else:
-    left = minimax(root.left, level + 1,)
-    right = minimax(root.right, level + 1,)
+    #print("We are at ", root.value)
     if level % 2 == 0:
-      return left if (left > right) else right
+      return (root.value, root.value, beta)
     else:
-      return left if (left < right) else right
+      return (root.value, alpha, root.value)
+  else:
+    #print("visisted ", root.value)
+    left_f = alphabeta(root.left, level + 1, alpha, beta)
+    left = left_f[0]
+
+    d_alpha = alpha
+    d_beta = beta
+
+    if level % 2 == 0:
+      d_alpha = left if left > alpha else alpha
+    else:
+      d_beta = left if left < beta else beta
+
+    if d_alpha < d_beta:
+      #print("Alpha is " , alpha , ". Beta is " , beta, ". We are at ", root.value)
+
+      #print("Part 2 Alpha is " , alpha , ". Beta is " , beta, ". We are at ", root.value)
+
+      if level % 2 == 0:
+        right_f = alphabeta(root.right, level + 1, left if left > alpha else alpha, beta)
+        right = right_f[0]
+        return (left, left if left > alpha else alpha, beta) if (left > right) else (right, right if right > alpha else alpha, beta)
+      else:
+        right_f = alphabeta(root.right, level + 1, alpha, left if left < beta else beta)
+        #print(root.right.value)
+        #print(right_f)
+        right = right_f[0]
+        return (left, alpha, left if left < beta else beta) if (left < right) else (right, alpha, right if right < beta else beta)
+    else:
+      return left_f
+        
 
 print(alphabeta(test1, 0, -10000, 10000))
+print(counter)
