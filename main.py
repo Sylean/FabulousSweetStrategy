@@ -68,7 +68,10 @@ def paint_level(row, level, levels):
       insert_spaces(pow(2,levels - level) - 1)
     else:
       insert_spaces(pow(2, levels - level))
-      print("{:02d}".format(row[num]), end="")
+      if num < len(row):
+        print("{:02d}".format(row[num]), end="")
+      else:
+        print("XX", end= "")
       insert_spaces(pow(2, levels - level) - 1)
   print("")
 
@@ -124,13 +127,13 @@ def alphabeta(root, level, alpha, beta):
   if (root.left == None) and (root.right == None):
     #print("We are at ", root.value)
     if level % 2 == 0:
-      return (root.value, root.value, beta)
+      return (Tree(None, None, root.value), (root.value, root.value, beta))
     else:
-      return (root.value, alpha, root.value)
+      return (Tree(None, None, root.value), (root.value, alpha, root.value))
   else:
-    #print("visisted ", root.value)
+    #print("visited ", root.value)
     left_f = alphabeta(root.left, level + 1, alpha, beta)
-    left = left_f[0]
+    left = left_f[1][0]
 
     d_alpha = alpha
     d_beta = beta
@@ -147,17 +150,22 @@ def alphabeta(root, level, alpha, beta):
 
       if level % 2 == 0:
         right_f = alphabeta(root.right, level + 1, left if left > alpha else alpha, beta)
-        right = right_f[0]
-        return (left, left if left > alpha else alpha, beta) if (left > right) else (right, right if right > alpha else alpha, beta)
+        right = right_f[1][0]
+        result = (left, left if left > alpha else alpha, beta) if (left > right) else (right, right if right > alpha else alpha, beta)
+        return (Tree(left_f[0], right_f[0], left if (left > right) else right), result)
       else:
         right_f = alphabeta(root.right, level + 1, alpha, left if left < beta else beta)
         #print(root.right.value)
         #print(right_f)
-        right = right_f[0]
-        return (left, alpha, left if left < beta else beta) if (left < right) else (right, alpha, right if right < beta else beta)
+        right = right_f[1][0]
+        result = (left, alpha, left if left < beta else beta) if (left < right) else (right, alpha, right if right < beta else beta)
+        return (Tree(left_f[0], right_f[0], left if (left < right) else right), result)
     else:
       return left_f
         
 
-print(alphabeta(test1, 0, -10000, 10000))
+print(alphabeta(test1, 0, -10000, 10000)[1])
+rep_tree(alphabeta(test1, 0, -10000, 10000)[0], 4)
 print(counter)
+
+#Let's build a simple decision game to test minimax and alphabeta pruning
